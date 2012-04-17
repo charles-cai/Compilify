@@ -150,6 +150,11 @@ namespace Compilify.Web.Controllers
         [HttpPost]
         public ActionResult Import(Uri address)
         {
+            if (address == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var code = string.Empty;
 
             if (address.Host.Contains("pastebin.com"))
