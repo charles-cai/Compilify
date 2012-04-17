@@ -29,6 +29,18 @@ strong {
     font-family: "Segoe UI", "Segoe WP", "Helvetica Neue", 'RobotoRegular', sans-serif;
 }
 
+input {
+    -webkit-border-radius: 0;
+       -moz-border-radius: 0;
+            border-radius: 0;
+}
+
+.btn {
+    -webkit-border-radius: 0;
+       -moz-border-radius: 0;
+            border-radius: 0;
+}
+
 /* Navbar 
  *****************************************************************************/
 .navbar,
@@ -247,4 +259,14 @@ h1 {
     font-size: 200px;
     margin: 20px 0;
     line-height: 200px;
+}
+
+.modal {
+    -webkit-border-radius: 0;
+       -moz-border-radius: 0;
+            border-radius: 0;
+}
+
+.modal form {
+    margin-bottom: 0;
 }

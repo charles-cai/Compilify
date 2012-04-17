@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Text;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Compilify.Models;
 using Compilify.Services;
 using Compilify.Web.Models;
 using Compilify.Web.Services;
-using Roslyn.Compilers.CSharp;
 
 namespace Compilify.Web.Controllers
 {
@@ -23,43 +22,50 @@ namespace Compilify.Web.Controllers
         private readonly IPostRepository db;
         private readonly CSharpCompiler compiler;
 
+        [HttpGet]
         public ActionResult Index()
         {
-            var classesBuilder = new StringBuilder();
+            var post = (TempData["Post"] as Post) ?? new Post();
+            if (string.IsNullOrEmpty(post.Classes))
+            {
+                var classesBuilder = new StringBuilder();
 
-            classesBuilder.AppendLine("public interface IPerson");
-            classesBuilder.AppendLine("{");
-            classesBuilder.AppendLine("    string Name { get; }");
-            classesBuilder.AppendLine();
-            classesBuilder.AppendLine("    string Greet();");
-            classesBuilder.AppendLine("}");
-            classesBuilder.AppendLine();
-            classesBuilder.AppendLine("class Person : IPerson");
-            classesBuilder.AppendLine("{");
-            classesBuilder.AppendLine("    public Person(string name)");
-            classesBuilder.AppendLine("    {");
-            classesBuilder.AppendLine("        Name = name;");
-            classesBuilder.AppendLine("    }");
-            classesBuilder.AppendLine();
-            classesBuilder.AppendLine("    public string Name { get; private set; }");
-            classesBuilder.AppendLine();
-            classesBuilder.AppendLine("    public string Greet()");
-            classesBuilder.AppendLine("    {");
-            classesBuilder.AppendLine("        if (Name == null)");
-            classesBuilder.AppendLine("            return \"Hello, stranger!\";");
-            classesBuilder.AppendLine();
-            classesBuilder.AppendLine("        return string.Format(\"Hello, {0}!\", Name);");
-            classesBuilder.AppendLine("    }");
-            classesBuilder.AppendLine("}");
+                classesBuilder.AppendLine("public interface IPerson");
+                classesBuilder.AppendLine("{");
+                classesBuilder.AppendLine("    string Name { get; }");
+                classesBuilder.AppendLine();
+                classesBuilder.AppendLine("    string Greet();");
+                classesBuilder.AppendLine("}");
+                classesBuilder.AppendLine();
+                classesBuilder.AppendLine("class Person : IPerson");
+                classesBuilder.AppendLine("{");
+                classesBuilder.AppendLine("    public Person(string name)");
+                classesBuilder.AppendLine("    {");
+                classesBuilder.AppendLine("        Name = name;");
+                classesBuilder.AppendLine("    }");
+                classesBuilder.AppendLine();
+                classesBuilder.AppendLine("    public string Name { get; private set; }");
+                classesBuilder.AppendLine();
+                classesBuilder.AppendLine("    public string Greet()");
+                classesBuilder.AppendLine("    {");
+                classesBuilder.AppendLine("        if (Name == null)");
+                classesBuilder.AppendLine("            return \"Hello, stranger!\";");
+                classesBuilder.AppendLine();
+                classesBuilder.AppendLine("        return string.Format(\"Hello, {0}!\", Name);");
+                classesBuilder.AppendLine("    }");
+                classesBuilder.AppendLine("}");
+
+                post.Classes = classesBuilder.ToString();
+
+                var commandBuilder = new StringBuilder();
+
+                commandBuilder.AppendLine("IPerson person = new Person(name: null);");
+                commandBuilder.AppendLine("");
+                commandBuilder.AppendLine("return person.Greet();");
+
+                post.Content = commandBuilder.ToString();
+            }
             
-            var commandBuilder = new StringBuilder();
-
-            commandBuilder.AppendLine("IPerson person = new Person(name: null);");
-            commandBuilder.AppendLine("");
-            commandBuilder.AppendLine("return person.Greet();");
-            
-            var post = new Post { Content = commandBuilder.ToString(), Classes = classesBuilder.ToString() };
-
             var viewModel = new PostViewModel
                             {
                                 Post = post,
@@ -139,6 +145,24 @@ namespace Compilify.Web.Controllers
             }
 
             return RedirectToAction("Show", routeValues);
+        }
+
+        [HttpPost]
+        public ActionResult Import(Uri address)
+        {
+            var code = string.Empty;
+
+            if (address.Host.Contains("pastebin.com"))
+            {
+                var pasteId = address.AbsolutePath.Replace("/", "");
+                using (var client = new WebClient())
+                {
+                    code = client.DownloadString(string.Format("http://pastebin.com/raw.php?i={0}", pasteId));
+                }
+            }
+
+            TempData["Post"] = new Post { Classes = code };
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

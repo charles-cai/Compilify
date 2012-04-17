@@ -259,6 +259,7 @@
     <None Include="Assets\fonts\Roboto-Regular-webfont.woff" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Shared\_Share.cshtml" />
+    <Content Include="Views\Home\_Import.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

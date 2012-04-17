@@ -45,6 +45,12 @@ namespace Compilify.Web {
                 defaults: new { controller = "Home", action = "About" },
                 constraints: new { httpMethod = new HttpMethodConstraint("GET") }
             );
+            
+            routes.MapLowercaseRoute(
+                name: "Import",
+                url: "import",
+                defaults: new { controller = "Home", action = "Import" }
+            );
 
             routes.MapLowercaseRoute(
                 name: "validate",

@@ -1,0 +1,19 @@
+﻿<div id="import" class="modal fade" style="display: none;">
+    @using (Html.BeginForm("Import", "Home", FormMethod.Post, new{ @class = "form-inline"}))
+    {
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">&times;</a>
+            <h2>import your code</h2>
+        </div>
+            
+        <div class="modal-body">
+            <label for="address">Import your code from <a href="http://pastebin.com" target="_blank">Pastebin.com</a>!</label>
+            <input class="input-xlarge" name="address" type="url" placeholder="http://pastebin.com/" />
+        </div>
+            
+        <div class="modal-footer">
+            <button type="reset" class="btn" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Import</button>
+        </div>
+    }
+</div>
